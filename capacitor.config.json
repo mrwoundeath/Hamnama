@@ -1,8 +1,0 @@
-{
-  "appId": "ir.bahambebinim.app",
-  "appName": "باهم ببینیم",
-  "webDir": "dist",
-  "server": {
-    "cleartext": true
-  }
-}
