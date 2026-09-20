@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#09090b">
+<title>باهم ببینیم</title>
+<script src="/socket.io/socket.io.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap');
+:root{--bg:#09090b;--panel:#111114;--panel2:#17171c;--line:#292930;--a:#19d3c5;--muted:#9999a3}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:var(--bg);color:#f5f5f7;font-family:Vazirmatn,Tahoma,sans-serif}button,input{font:inherit}button{cursor:pointer}
+.intro{position:fixed;inset:0;z-index:9;display:grid;place-items:center;background:radial-gradient(circle,#182022,#09090b 60%);transition:.5s}.intro.hide{opacity:0;pointer-events:none}.introbox{text-align:center}.mark{width:78px;height:78px;margin:auto;border-radius:25px;background:linear-gradient(135deg,var(--a),#75eee5);display:grid;place-items:center;color:#07100f;font-size:34px;box-shadow:0 0 55px #19d3c533;animation:pop .8s ease}.intro h1{font-size:38px;margin:18px 0 4px}.intro p{color:var(--muted);margin:0}@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.login{min-height:100%;display:grid;place-items:center;padding:20px}.card{width:min(430px,100%);padding:30px;border:1px solid var(--line);border-radius:25px;background:linear-gradient(#151519,#101013);box-shadow:0 25px 80px #0008}.brand{font-size:30px;font-weight:800}.brand b{color:var(--a)}.muted{color:var(--muted);line-height:1.8}.card label{display:block;margin:15px 0 7px;font-size:13px}.card input{width:100%;padding:13px;border-radius:12px;border:1px solid #2a2a31;background:#0c0c0f;color:#fff;outline:0}.card input:focus{border-color:var(--a)}.primary{width:100%;margin-top:20px;padding:13px;border:0;border-radius:12px;background:var(--a);color:#06100f;font-weight:800}.err{color:#ff7777;font-size:13px;margin-top:10px}
+.app{height:100%;display:flex;flex-direction:column}.top{height:58px;flex:0 0 58px;display:flex;align-items:center;gap:12px;padding:0 15px;border-bottom:1px solid var(--line);background:#0c0c0f}.top .brand{font-size:19px}.room{margin:auto;color:#aaa;background:#151519;padding:6px 12px;border:1px solid var(--line);border-radius:99px;font-size:12px}.conn{font-size:11px;color:var(--a)}
+.portrait{display:grid;grid-template-rows:1fr 1fr;height:calc(100% - 58px);min-height:0}.landscape{display:none}
+.chat,.video{min-height:0;background:var(--panel)}.chat{display:flex;flex-direction:column;border-bottom:1px solid var(--line)}.chathead{height:48px;flex:0 0 48px;padding:0 13px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:#121216}.msgs{flex:1;min-height:0;overflow:auto;padding:12px}.empty{height:100%;display:grid;place-items:center;text-align:center;color:#666;font-size:13px}.msg{margin-bottom:10px}.meta{font-size:10px;color:#8f8f98;margin-bottom:4px}.meta strong{color:#e8e8eb}.bubble{display:inline-block;max-width:88%;padding:8px 11px;border-radius:12px 12px 12px 4px;background:#1b1b21;border:1px solid #292930;font-size:13px;line-height:1.65}.chatinput{display:flex;gap:7px;padding:9px;border-top:1px solid var(--line)}.chatinput input{min-width:0;flex:1;padding:10px;border:1px solid #292930;border-radius:11px;background:#0c0c0f;color:#fff}.chatinput button{width:44px;border:0;border-radius:11px;background:var(--a);font-size:19px}
+.video{display:flex;flex-direction:column}.stage{flex:1;min-height:0;display:grid;place-items:center;background:#050506}.stage video{width:100%;height:100%;object-fit:contain;background:#000}.emptyvideo{text-align:center;color:#aaa;max-width:400px;padding:20px}.emptyvideo h2{color:#eee;font-size:18px}.emptyvideo p{font-size:12px;line-height:1.9}.upload,.change{display:inline-block;padding:10px 14px;border-radius:11px;background:var(--a);color:#06100f;font-weight:700;cursor:pointer}.change{background:#1b1b21;color:#ddd;border:1px solid #292930;font-size:11px}.toolbar{height:72px;flex:0 0 72px;display:flex;align-items:center;gap:9px;padding:9px;border-top:1px solid var(--line);background:#111114}.filename{flex:1;min-width:0;font-size:11px}.filename b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.filename span{color:#707078}.controls{display:flex;gap:5px;direction:ltr}.controls button{width:39px;height:39px;border:1px solid #2b2b31;border-radius:11px;background:#19191e;color:#ddd}.controls .play{width:45px;height:45px;background:var(--a);color:#07100f;border:0}.sync{text-align:center;background:#0d0d10;color:#707078;font-size:9px;padding:4px}
+@media(orientation:landscape) and (min-width:650px){.portrait{display:none}.landscape{height:calc(100% - 58px);display:grid;grid-template-columns:4fr 1fr;min-height:0}.landscape .video{border-left:1px solid var(--line)}.landscape .chat{border:0}}
+@media(max-width:420px){.filename{display:none}.top{padding:0 9px}.room{padding:5px 8px}}
+</style>
+</head>
+<body>
+<div class="intro" id="intro"><div class="introbox"><div class="mark">▶</div><h1>باهم ببینیم</h1><p>فیلم دیدن، کنار هم</p></div></div>
+
+<div id="login" class="login">
+<div class="card">
+<div class="brand"><b>باهم</b> ببینیم</div>
+<p class="muted">وارد روم شوید و با دوستتان همزمان فیلم ببینید.</p>
+<label>نام شما</label><input id="name" placeholder="مثلاً Taha" maxlength="30">
+<label>کد روم</label><input id="room" placeholder="مثلاً FRIEND42" maxlength="20" dir="ltr">
+<div id="err" class="err"></div>
+<button id="join" class="primary">ورود به روم ←</button>
+</div></div>
+
+<div id="app" class="app" style="display:none">
+<header class="top"><div class="brand"><b>باهم</b> ببینیم</div><div class="room">روم: <strong id="roomLabel"></strong></div><div class="conn" id="conn">● متصل</div></header>
+<div class="portrait"><div id="chat1"></div><div id="video1"></div></div>
+<div class="landscape"><div id="video2"></div><div id="chat2"></div></div>
+</div>
+
+<script>
+const socket=io();
+let video=null, videoUrl=null, suppress=false, users=[], messages=[];
+const $=id=>document.getElementById(id);
+
+function chatHTML(){return `<section class="chat"><div class="chathead"><strong>💬 چت روم</strong><span id="people">۰/۲ نفر</span></div><div class="msgs" id="msgs"><div class="empty">پیامی وجود ندارد.<br>گفت‌وگو را شروع کنید.</div></div><form class="chatinput" id="chatform"><input id="chattext" placeholder="پیامتان را بنویسید..." maxlength="500"><button>➤</button></form></section>`}
+function videoHTML(){return `<section class="video"><div class="stage" id="stage"><div class="emptyvideo"><h2>ویدئوی خودت را انتخاب کن</h2><p>فایل روی همین دستگاه می‌ماند و فقط زمان پخش با نفر دوم هماهنگ می‌شود.</p><label class="upload">انتخاب ویدئو<input id="file" type="file" accept="video/*" hidden></label></div></div><div class="toolbar"><div class="filename"><b id="fname">ویدئو انتخاب نشده</b><span id="time">00:00 / 00:00</span></div><div class="controls"><button id="back">↶۱۰</button><button class="play" id="play">▶</button><button id="forward">۱۰↷</button></div><label class="change">تغییر ویدئو<input id="file2" type="file" accept="video/*" hidden></label></div><div class="sync">زمان پخش با نفر دوم همگام می‌شود</div></section>`}
+$("chat1").innerHTML=chatHTML();$("chat2").innerHTML=chatHTML();$("video1").innerHTML=videoHTML();$("video2").innerHTML=videoHTML();
+
+function bind(){
+document.querySelectorAll('input[type=file]').forEach(x=>x.onchange=e=>loadVideo(e.target.files[0]));
+document.querySelectorAll('#play').forEach(x=>x.onclick=toggle);
+document.querySelectorAll('#back').forEach(x=>x.onclick=()=>seek(-10));
+document.querySelectorAll('#forward').forEach(x=>x.onclick=()=>seek(10));
+document.querySelectorAll('#chatform').forEach(f=>f.onsubmit=e=>{e.preventDefault();const i=f.querySelector('input');if(i.value.trim()){socket.emit('chat',i.value.trim());i.value=''}});
+}
+bind();
+
+function loadVideo(file){if(!file)return;if(videoUrl)URL.revokeObjectURL(videoUrl);videoUrl=URL.createObjectURL(file);document.querySelectorAll('.stage').forEach(s=>s.innerHTML=`<video id="mainvideo" src="${videoUrl}" playsinline></video>`);video=document.getElementById('mainvideo');$('fname').textContent=file.name;document.querySelectorAll('#fname').forEach(x=>x.textContent=file.name);video.onloadedmetadata=updateTime;video.ontimeupdate=updateTime;video.onplay=()=>{if(!suppress)emit(true)};video.onpause=()=>{if(!suppress)emit(false)};video.onseeking=()=>{if(!suppress)emit(!video.paused)};document.querySelectorAll('#play').forEach(x=>x.textContent='▶')}
+function emit(playing){if(video&&!suppress)socket.emit('playback',{playing,time:video.currentTime})}
+function toggle(){if(!video)return;if(video.paused)video.play();else video.pause()}
+function seek(d){if(!video)return;video.currentTime=Math.max(0,Math.min((video.duration||Infinity),video.currentTime+d));emit(!video.paused)}
+function updateTime(){if(!video)return;let a=fmt(video.currentTime),b=fmt(video.duration);document.querySelectorAll('#time').forEach(x=>x.textContent=a+' / '+b);document.querySelectorAll('#play').forEach(x=>x.textContent=video.paused?'▶':'Ⅱ')}
+function fmt(x){if(!Number.isFinite(x))return'00:00';let s=Math.floor(x),m=Math.floor(s/60);return String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+
+$("join").onclick=()=>{let name=$("name").value.trim(),room=$("room").value.trim();if(!name||!room){$("err").textContent='نام و کد روم را وارد کنید.';return}socket.emit('join-room',{name,roomCode:room})}
+socket.on('joined-room',d=>{$("login").style.display='none';$("app").style.display='flex';$("roomLabel").textContent=d.roomCode;users=d.users;renderUsers();setTimeout(()=>{$("intro").classList.add('hide')},100);if(d.playback)applyRemote(d.playback)})
+socket.on('room-error',m=>{$("err").textContent=m})
+socket.on('room-users',d=>{users=d.users;renderUsers()})
+socket.on('chat',m=>{messages.push(m);renderChat()})
+socket.on('playback',applyRemote)
+socket.on('disconnect',()=>{$("conn").textContent='○ قطع';$("conn").style.color='#ff7777'})
+socket.on('connect',()=>{$("conn").textContent='● متصل';$("conn").style.color='var(--a)'})
+
+function renderUsers(){document.querySelectorAll('#people').forEach(x=>x.textContent=users.length+'/۲ نفر')}
+function renderChat(){document.querySelectorAll('#msgs').forEach(box=>{box.innerHTML=messages.length?messages.map(m=>`<div class="msg"><div class="meta"><strong>${esc(m.name)}</strong> · ${new Date(m.time).toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit'})}</div><div class="bubble">${esc(m.text)}</div></div>`).join(''):`<div class="empty">پیامی وجود ندارد.<br>گفت‌وگو را شروع کنید.</div>`;box.scrollTop=box.scrollHeight})}
+function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function applyRemote(d){if(!video)return;suppress=true;const t=Math.max(0,Number(d.time)||0);video.currentTime=Math.min(t,video.duration||t);if(d.playing)video.play().catch(()=>{});else video.pause();setTimeout(()=>suppress=false,120)}
+setTimeout(()=>{$("intro").classList.add('hide')},2300)
+</script>
+</body>
+</html>
